@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contato — K4IC_MÇ</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ══════════════════════════════════════════
+       SUBSTITUA OS VALORES ABAIXO:
+       SUPABASE_URL = URL do seu projeto
+       SUPABASE_KEY = anon/public key
+       ══════════════════════════════════════════ */
+    :root {
+      --cyan:   #00BFFF;
+      --red:    #FF003C;
+      --violet: #7000FF;
+      --bg:     #0d0d0d;
+      --surface:#121214;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .terminal {
+      width: 100%;
+      max-width: 600px;
+      border: 1px solid rgba(0,191,255,0.25);
+      background: var(--surface);
+      box-shadow: 0 0 30px rgba(0,191,255,0.08);
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(0,191,255,0.1);
+      background: rgba(0,0,0,0.4);
+    }
+    .dot { width: 10px; height: 10px; }
+    .dot.r { background: var(--red); }
+    .dot.y { background: #FFD600; }
+    .dot.g { background: var(--cyan); }
+    .title { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 8px; letter-spacing: 2px; }
+    form { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+    label { font-size: 10px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    input, textarea, select {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(0,191,255,0.15);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus, textarea:focus { border-color: rgba(0,191,255,0.5); }
+    textarea { resize: vertical; min-height: 100px; }
+    .prompt { color: rgba(0,191,255,0.4); margin-right: 6px; }
+    button {
+      border: 1px solid rgba(0,191,255,0.3);
+      background: transparent;
+      color: var(--cyan);
+      font-family: inherit;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 6px;
+    }
+    button:hover { background: rgba(0,191,255,0.08); border-color: var(--cyan); }
+    .msg { font-size: 12px; padding: 10px 14px; border: 1px solid; display: none; }
+    .msg.ok  { color: var(--cyan);  border-color: rgba(0,191,255,0.3); }
+    .msg.err { color: var(--red);   border-color: rgba(255,0,60,0.3); }
+  </style>
+</head>
+<body>
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span class="title">CONTACT_TERMINAL — K4IC_MÇ</span>
+  </div>
+  <form id="contactForm">
+    <div>
+      <label>Identificador (nome)</label>
+      <input type="text" id="nome" placeholder="Seu nome" required/>
+    </div>
+    <div>
+      <label>Protocolo de Email</label>
+      <input type="email" id="email" placeholder="seu@email.com" required/>
+    </div>
+    <div>
+      <label>WhatsApp</label>
+      <input type="tel" id="whatsapp" placeholder="(XX) XXXXX-XXXX"/>
+    </div>
+    <div>
+      <label>Canal de contato preferido</label>
+      <select id="contato">
+        <option value="">Selecione...</option>
+        <option value="email">Email</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="instagram">Instagram</option>
+        <option value="linkedin">LinkedIn</option>
+      </select>
+    </div>
+    <div>
+      <label>Assunto</label>
+      <input type="text" id="assunto" placeholder="Sobre o que quer falar?" required/>
+    </div>
+    <div>
+      <label><span class="prompt">></span> Mensagem</label>
+      <textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea>
+    </div>
+    <div id="msgOk"  class="msg ok">✔ Mensagem transmitida com sucesso!</div>
+    <div id="msgErr" class="msg err">✖ Erro ao enviar. Tente novamente.</div>
+    <button type="submit">▶ Transmitir Mensagem</button>
+  </form>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════
+  // SUBSTITUA AQUI:
+  const SUPABASE_URL = 'https://XXXXXXXXXXX.supabase.co'
+  const SUPABASE_KEY = 'SUA_ANON_KEY_AQUI'
+  // ══════════════════════════════════════════════
+
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const ok  = document.getElementById('msgOk')
+    const err = document.getElementById('msgErr')
+    ok.style.display = 'none'
+    err.style.display = 'none'
+
+    const payload = {
+      nome:     document.getElementById('nome').value,
+      email:    document.getElementById('email').value,
+      whatsapp: document.getElementById('whatsapp').value,
+      contato:  document.getElementById('contato').value,
+      assunto:  document.getElementById('assunto').value,
+      mensagem: document.getElementById('mensagem').value,
+    }
+
+    const { error } = await db.from('contacts').insert([payload])
+
+    if (error) {
+      err.style.display = 'block'
+      console.error(error)
+    } else {
+      ok.style.display = 'block'
+      e.target.reset()
+    }
+  })
+</script>
+</body>
+</html>
